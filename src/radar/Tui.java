@@ -89,6 +89,11 @@ public class Tui {
 
             switch (args) {
                 case "status":
+                    for (int i = 0; i < 150; i++) {
+                        System.out.print("-");
+                    }
+                    System.out.println("");
+                    System.out.println("");
                     try {
                         //Get the DOM Builder Factory
                         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -141,6 +146,7 @@ public class Tui {
                         for (Sensor sen : sensList) {
                             //Prepei na VALW to ps -ef an einai trexei to programma kai dump an einai online
                             if (getInfo(sen.id)) {
+
                                 System.out.println(sen + "| running");
                             } else {
                                 System.out.println(sen + "| inactive");
@@ -151,6 +157,10 @@ public class Tui {
                     }
 //                    for (int i = 0; i < 10; i++) {
 //                        System.out.printf("Radar %20s -> %20s\n", "MPS", "PORT");
+                    for (int i = 0; i < 150; i++) {
+                        System.out.print("_");
+                    }
+                    System.out.println("");
 
                     break;
                 case "show":
@@ -172,11 +182,19 @@ public class Tui {
                                     List<Sensor> startSenList = readSensorXML();
                                     for (Sensor startSenList1 : startSenList) {
                                         if (getInfo(startSenList1.id) == false) {
-
                                             String printStartingData = "Starting Sensor : ";
                                             System.out.println(printStartingData + startSenList1.id);
+                                            for (int rendering = 0; rendering < 65; rendering++) {
+                                                System.out.print("_");
+                                            }
+                                            System.out.println("");
                                             String startSen = startSensorCommand(startSenList1.id, startSenList1.mps, startSenList1.port, startSenList1.baud);
                                             System.out.println(startSen);
+                                            System.out.println("");
+                                            for (int rendering = 0; rendering < 65; rendering++) {
+                                                System.out.print("=");
+                                            }
+                                            System.out.println("");
                                         } else {
                                             System.out.printf("The sensor %s ID is allready running\n", startSenList1.id);
                                         }
@@ -210,10 +228,23 @@ public class Tui {
                                     for (Sensor startSenList2 : startSenList) {
                                         if (testID[i].equals(startSenList2.id)) {
                                             j = 1;
-                                            String printStartingData = "Starting Sensor : ";
-                                            System.out.println(printStartingData + startSenList2.id);
-                                            String startSen = startSensorCommand(startSenList2.id, startSenList2.mps, startSenList2.port, startSenList2.baud);
-                                            System.out.println(startSen);
+                                            if (getInfo(startSenList2.id) == false) {
+                                                String printStartingData = "Starting Sensor : ";
+                                                System.out.println(printStartingData + startSenList2.id);
+                                                for (int rendering = 0; rendering < 65; rendering++) {
+                                                    System.out.print("_");
+                                                }
+                                                System.out.println("");
+                                                String startSen = startSensorCommand(startSenList2.id, startSenList2.mps, startSenList2.port, startSenList2.baud);
+                                                System.out.println(startSen);
+                                                System.out.println("");
+                                                for (int rendering = 0; rendering < 65; rendering++) {
+                                                    System.out.print("=");
+                                                }
+                                                System.out.println("");
+                                            } else {
+                                                System.out.printf("The sensor %s ID is allready running\n", startSenList2.id);
+                                            }
                                         }
                                     }
                                     if (j != 1) {
@@ -236,10 +267,18 @@ public class Tui {
                                 List<Sensor> startSenList = readSensorXML();
                                 for (Sensor startSenList3 : startSenList) {
                                     if (id.equals(startSenList3.id)) {
-                                        String printStartingData = "Starting Sensor : ";
-                                        System.out.println(printStartingData + startSenList3.id);
-                                        String startSen = startSensorCommand(startSenList3.id, startSenList3.mps, startSenList3.port, startSenList3.baud);
-                                        System.out.println(startSen);
+                                        if (getInfo(startSenList3.id) == false) {
+                                            for (int rendering = 0; rendering < 65; rendering++) {
+                                                System.out.print("_");
+                                            }
+                                            System.out.println("");
+                                            String printStartingData = "Starting Sensor : ";
+                                            System.out.println(printStartingData + startSenList3.id);
+                                            String startSen = startSensorCommand(startSenList3.id, startSenList3.mps, startSenList3.port, startSenList3.baud);
+                                            System.out.println(startSen);
+                                        } else {
+                                            System.out.printf("The sensor %s ID is allready running\n", startSenList3.id);
+                                        }
                                     }
 
                                 }
@@ -265,6 +304,27 @@ public class Tui {
                     testArg2 = args2.split(" ");
                     args2 = testArg2[0];
                     if (args2.equals("sensor")) {
+                        for (int i = 1 ; i < testArg2.length; i++) {
+                            if (testArg2[i].equals("all")) {
+                                try {
+                                    List<Sensor> stopSenList = readSensorXML();
+                                    for (Sensor stopSenLsit1 : stopSenList) {
+                                        
+                                    }
+                                } catch (ParserConfigurationException ex) {
+                                    Logger.getLogger(Tui.class.getName()).log(Level.SEVERE, null, ex);
+                                } catch (SAXException ex) {
+                                    Logger.getLogger(Tui.class.getName()).log(Level.SEVERE, null, ex);
+                                } catch (IOException ex) {
+                                    Logger.getLogger(Tui.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                            
+                            
+                            }else {
+                                id = id.concat(testArg2[i]);
+                            }
+                            
+                        } 
                         System.out.println("Auto einai to args2 : " + args2);
                     } else {
                         System.out.println("For help of start press help start");
@@ -296,7 +356,13 @@ public class Tui {
         return sensorOutPut;
 
     }
-
+    /**
+     * H synarthsei auth pernei ena ID kai 
+     * elegxei ean to proccess me to ID auto
+     * Trexei; Ean trexei epistrefei TRUE  kai FALSE ean den trexei
+     * @param sensorID
+     * @return 
+     */
     private boolean getInfo(String sensorID) {
         String ourPID = "ps -u mio -f -o \"pid,args\" | grep \"-r " + sensorID + "\" | grep bin_sun4v_sunOS/radar_receive.exe | nawk \'{print $1}\'";
         String isRunning;

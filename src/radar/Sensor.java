@@ -19,7 +19,7 @@ public class Sensor {
     
     @Override
     public String toString(){
-        String format = String.format("Radar : (%-3s)%-10s%20s->%s %20s :%s | %s,%s", id, name, "MPS", mps, "PORT", port , baud, type);
+        String format = String.format("Radar : (%-3s)%-10s%20s->%s %20s :%s | %-5s,%-7s", id, name, "MPS", mps, "PORT", port , baud, type);
         return format; 
     }
 
