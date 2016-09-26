@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+
+
+<Radars>
+    <Sensor type = "S743E"> 
+        <name>Parnis</name>
+        <id>69</id>
+        <mps>1ake_mps2</mps>
+        <port>2</port>
+        <baud>9600</baud>
+    </Sensor>
+    
+    <Sensor type = "S743E"> 
+        <name>Ziros</name>
+        <id>63</id>
+        <mps>1ake_mps2</mps>
+        <port>2</port>
+        <baud>9600</baud>
+    </Sensor>
+    
+    <Sensor type = "RAT-31"> 
+        <name>Lefkas</name>
+        <id>464</id>
+        <mps>1ake_mps3</mps>
+        <port>3</port>
+        <baud>9600</baud>
+    </Sensor>
+    
+    
+</Radars>
