@@ -9,7 +9,7 @@ and open the template in the editor.
 <Link1>
     <Link type = "mps_1000_async" > 
         <name>Parnis</name>
-        <id>69</id>
+        <remote>69</remote>
         <mps>1ake_mps2</mps>
         <port>2</port>
         <baud>9600</baud>

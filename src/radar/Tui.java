@@ -140,9 +140,9 @@ public class Tui {
                         }
                         for (Sensor sen : sensList) {
                             //Prepei na VALW to ps -ef an einai trexei to programma kai dump an einai online
-                            if (!getInfo(sen.id)) {
+                            if (getInfo(sen.id)) {
                                 System.out.println(sen + "| running");
-                            }else {
+                            } else {
                                 System.out.println(sen + "| inactive");
                             }
                         }
@@ -171,10 +171,15 @@ public class Tui {
                                 try {
                                     List<Sensor> startSenList = readSensorXML();
                                     for (Sensor startSenList1 : startSenList) {
-                                        String printStartingData = "Starting Sensor : ";
-                                        String startSen = startSensorCommand(startSenList1.id, startSenList1.mps, startSenList1.port, startSenList1.baud);
-                                        System.out.println(startSen);
-                                        System.out.println(printStartingData + startSenList1.id);
+                                        if (getInfo(startSenList1.id) == false) {
+
+                                            String printStartingData = "Starting Sensor : ";
+                                            System.out.println(printStartingData + startSenList1.id);
+                                            String startSen = startSensorCommand(startSenList1.id, startSenList1.mps, startSenList1.port, startSenList1.baud);
+                                            System.out.println(startSen);
+                                        } else {
+                                            System.out.printf("The sensor %s ID is allready running\n", startSenList1.id);
+                                        }
                                     }
                                 } catch (ParserConfigurationException ex) {
                                     Logger.getLogger(Tui.class.getName()).log(Level.SEVERE, null, ex);
@@ -293,18 +298,19 @@ public class Tui {
     }
 
     private boolean getInfo(String sensorID) {
-        String ourPID = "ps -u mio -f -o \"pid,args\" | grep \"-r " + sensorID + "\" | grep bin_sun4v_sunOS/radar_receive.exe | naw \'{print $1}\'";
+        String ourPID = "ps -u mio -f -o \"pid,args\" | grep \"-r " + sensorID + "\" | grep bin_sun4v_sunOS/radar_receive.exe | nawk \'{print $1}\'";
         String isRunning;
         isRunning = obj.executeCommand(ourPID);
-        //System.out.println(ourPID + " ::::::" + isRunning + " ::::::");
+        //System.out.println(ourPID + " ::::::" + isRunning + "::::::");
         if (isRunning.equals("")) {
-            return true;
+            return false;
         } else {
 
-            return false;
+            return true;
         }
     }
 
+    //epistrefei array list typou Senosr
     public List<Sensor> readSensorXML() throws ParserConfigurationException, SAXException, IOException {
         //Get the DOM Builder Factory
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -357,6 +363,61 @@ public class Tui {
 //            System.out.println(sen);
 //        }
         return sensList;
+    }
+
+    //epistrefei array list typou Link
+    public List<Link1> readLinkXML() throws ParserConfigurationException, SAXException, IOException {
+        //Get the DOM Builder Factory
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        //Get the DOM Builder
+        DocumentBuilder builder = factory.newDocumentBuilder();
+        //Load and parse the XML Document
+        //Document contains the complete XML as a Tree.
+        Document configSensor = builder.parse(new File("ConfigLink1.xml"));
+
+        List<Link1> link1List = new ArrayList<>();
+
+        //Iterating throught the nodes and extracting Sensrors form the XML
+        NodeList linkNode = configSensor.getDocumentElement().getChildNodes();
+        for (int temp = 0; temp < linkNode.getLength(); temp++) {
+            Node node = linkNode.item(temp);
+            if (node instanceof Element) {
+                Link1 link = new Link1();
+                link.type = node.getAttributes().getNamedItem("type").getNodeValue();
+
+                NodeList childnodes = node.getChildNodes();
+                for (int temp2 = 0; temp2 < childnodes.getLength(); temp2++) {
+                    Node cnode = childnodes.item(temp2);
+                    if (cnode instanceof Element) {
+                        String content = cnode.getLastChild().getTextContent().trim();
+                        switch (cnode.getNodeName()) {
+                            case "name":
+                                link.name = content;
+                                break;
+                            case "remote":
+                                link.remote = content;
+                                break;
+                            case "mps":
+                                link.mps = content;
+                                break;
+                            case "port":
+                                link.port = content;
+                                break;
+                            case "baud":
+                                link.baud = content;
+                                break;
+
+                        }
+                    }
+                }
+                link1List.add(link);
+            }
+
+        }
+//        for (Sensor sen : sensList) {
+//            System.out.println(sen);
+//        }
+        return link1List;
     }
 
 }
