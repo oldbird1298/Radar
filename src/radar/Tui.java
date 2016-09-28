@@ -22,6 +22,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import radar.udp.Client.udpClient;
+import radar.udp.Server.udpServer;
 
 /**
  *
@@ -44,7 +46,14 @@ public class Tui {
 
     }
 
-    public void tuishellStart() {
+    public void tuishellStart(String mode) {
+        if (mode.equals("server")) {
+            udpServer server = new udpServer();
+        } else if (mode.equals("client")) {
+            udpClient client = new udpClient();
+        } else {
+            mode = "standalone";
+        }
         do {
             System.out.flush();
             //clearScreen();
@@ -166,6 +175,19 @@ public class Tui {
                 case "show":
 
                     showProp.showSystem();
+                    System.out.println("TMHMA PROG. AER.");
+                    break;
+                case "check":
+                    if (mode.equals("server")) {
+                        udpServer server = new udpServer();
+                        server.udpServer(7777);
+                    } else if (mode.equals("client")) {
+                        udpClient client = new udpClient();
+                        client.udpClient("192.168.1.4", 7777);
+                    } else {
+                        mode = "standalone";
+                    }
+
                     System.out.println("TMHMA PROG. AER.");
                     break;
                 case "start":
@@ -304,12 +326,12 @@ public class Tui {
                     testArg2 = args2.split(" ");
                     args2 = testArg2[0];
                     if (args2.equals("sensor")) {
-                        for (int i = 1 ; i < testArg2.length; i++) {
+                        for (int i = 1; i < testArg2.length; i++) {
                             if (testArg2[i].equals("all")) {
                                 try {
                                     List<Sensor> stopSenList = readSensorXML();
                                     for (Sensor stopSenLsit1 : stopSenList) {
-                                        
+
                                     }
                                 } catch (ParserConfigurationException ex) {
                                     Logger.getLogger(Tui.class.getName()).log(Level.SEVERE, null, ex);
@@ -318,13 +340,12 @@ public class Tui {
                                 } catch (IOException ex) {
                                     Logger.getLogger(Tui.class.getName()).log(Level.SEVERE, null, ex);
                                 }
-                            
-                            
-                            }else {
+
+                            } else {
                                 id = id.concat(testArg2[i]);
                             }
-                            
-                        } 
+
+                        }
                         System.out.println("Auto einai to args2 : " + args2);
                     } else {
                         System.out.println("For help of start press help start");
@@ -356,12 +377,13 @@ public class Tui {
         return sensorOutPut;
 
     }
+
     /**
-     * H synarthsei auth pernei ena ID kai 
-     * elegxei ean to proccess me to ID auto
-     * Trexei; Ean trexei epistrefei TRUE  kai FALSE ean den trexei
+     * H synarthsei auth pernei ena ID kai elegxei ean to proccess me to ID auto
+     * Trexei; Ean trexei epistrefei TRUE kai FALSE ean den trexei
+     *
      * @param sensorID
-     * @return 
+     * @return
      */
     private boolean getInfo(String sensorID) {
         String ourPID = "ps -u mio -f -o \"pid,args\" | grep \"-r " + sensorID + "\" | grep bin_sun4v_sunOS/radar_receive.exe | nawk \'{print $1}\'";
