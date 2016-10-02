@@ -287,8 +287,10 @@ public class Tui {
                             System.out.println(id);
                             try {
                                 List<Sensor> startSenList = readSensorXML();
+                                int j = 0;
                                 for (Sensor startSenList3 : startSenList) {
                                     if (id.equals(startSenList3.id)) {
+                                        j = 1;
                                         if (getInfo(startSenList3.id) == false) {
                                             for (int rendering = 0; rendering < 65; rendering++) {
                                                 System.out.print("_");
@@ -303,6 +305,9 @@ public class Tui {
                                         }
                                     }
 
+                                }
+                                if (j != 1) {
+                                    System.out.printf("The %s ID of Sensor is not in the ConfigSensorXML.\n", id);
                                 }
                             } catch (ParserConfigurationException ex) {
                                 Logger.getLogger(Tui.class.getName()).log(Level.SEVERE, null, ex);
@@ -331,7 +336,7 @@ public class Tui {
                                 try {
                                     List<Sensor> stopSenList = readSensorXML();
                                     for (Sensor stopSenLsit1 : stopSenList) {
-
+                                        System.out.println(stopSensor(stopSenLsit1.id));
                                     }
                                 } catch (ParserConfigurationException ex) {
                                     Logger.getLogger(Tui.class.getName()).log(Level.SEVERE, null, ex);
@@ -367,6 +372,21 @@ public class Tui {
     public static void clearScreen() {
         System.out.print("\033[H\033[2J");
         System.out.flush();
+
+    }
+
+    private String stopSensor(String id) {
+        String results;
+        String ourPID = "ps -u mio -f -o \"pid,args\" | grep \"-r " + id + "\" | grep bin_sun4v_sunOS/radar_receive.exe | nawk \'{print $1}\'";
+        String isRunning;
+        isRunning = obj.executeCommand(ourPID);
+        if (isRunning.equals("")) {
+            return "The Sensor ID" + id + "is not running";
+        }else {
+            String kill = "kill " + isRunning;
+            results = obj.executeCommand(kill);
+            return "Stopping sensor " + id + " " + results;
+        }
 
     }
 
