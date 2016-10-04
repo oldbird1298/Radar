@@ -32,13 +32,14 @@ import radar.udp.Server.udpServer;
 public class Tui {
 
     Scanner commands = new Scanner(System.in);
+    ShowSystem showProp = new ShowSystem();
+    ExecuteShellCommand obj = new ExecuteShellCommand();
     final String os = System.getProperty("os.name");
     String state = new String();
+    String AOCS_PROGS = getAOCS_PROGS();
     String args = new String();
     String args2 = new String();
     String id = new String();
-    ShowSystem showProp = new ShowSystem();
-    ExecuteShellCommand obj = new ExecuteShellCommand();
 
     public Tui() {
         state = "started";
@@ -172,9 +173,87 @@ public class Tui {
                     System.out.println("");
 
                     break;
+
+                case "#":
+
+                    for (int i = 0; i < 150; i++) {
+                        System.out.print("-");
+                    }
+                    System.out.println("");
+                    System.out.println("");
+                    try {
+                        //Get the DOM Builder Factory
+                        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+                        //Get the DOM Builder
+                        DocumentBuilder builder = factory.newDocumentBuilder();
+                        //Load and parse the XML Document
+                        //Document contains the complete XML as a Tree.
+                        Document configSensor = builder.parse(new File("ConfigSensor.xml"));
+
+                        List<Sensor> sensList = new ArrayList<>();
+
+                        //Iterating throught the nodes and extracting Sensrors form the XML
+                        NodeList sensorNode = configSensor.getDocumentElement().getChildNodes();
+
+                        for (int temp = 0; temp < sensorNode.getLength(); temp++) {
+                            Node node = sensorNode.item(temp);
+                            if (node instanceof Element) {
+                                Sensor sen = new Sensor();
+                                sen.type = node.getAttributes().getNamedItem("type").getNodeValue();
+
+                                NodeList childnodes = node.getChildNodes();
+                                for (int temp2 = 0; temp2 < childnodes.getLength(); temp2++) {
+                                    Node cnode = childnodes.item(temp2);
+                                    if (cnode instanceof Element) {
+                                        String content = cnode.getLastChild().getTextContent().trim();
+                                        switch (cnode.getNodeName()) {
+                                            case "name":
+                                                sen.name = content;
+                                                break;
+                                            case "id":
+                                                sen.id = content;
+                                                break;
+                                            case "mps":
+                                                sen.mps = content;
+                                                break;
+                                            case "port":
+                                                sen.port = content;
+                                                break;
+                                            case "baud":
+                                                sen.baud = content;
+                                                break;
+
+                                        }
+                                    }
+                                }
+                                sensList.add(sen);
+                            }
+
+                        }
+                        for (Sensor sen : sensList) {
+                            //Prepei na VALW to ps -ef an einai trexei to programma kai dump an einai online
+                            if (getInfo(sen.id)) {
+
+                                System.out.println(sen + "| running");
+                            } else {
+                                System.out.println(sen + "| inactive");
+                            }
+                        }
+                    } catch (Throwable t) {
+                        t.printStackTrace();
+                    }
+//                    for (int i = 0; i < 10; i++) {
+//                        System.out.printf("Radar %20s -> %20s\n", "MPS", "PORT");
+                    for (int i = 0; i < 150; i++) {
+                        System.out.print("_");
+                    }
+                    System.out.println("");
+
+                    break;
                 case "show":
 
                     showProp.showSystem();
+                    System.out.printf("The AOCS_PROGS : %s\n", AOCS_PROGS);
                     System.out.println("TMHMA PROG. AER.");
                     break;
                 case "check":
@@ -320,6 +399,16 @@ public class Tui {
                         }
                         System.out.printf("Auto einai to args2 : %s\nKai auto einai to id : %s\n", args2, id);
                     } else if (args2.equals("link")) {
+                        for (int i = 1 ; i < testArg2.length ; i ++) {
+                            if (testArg2[i].equals("all")) {
+                            
+                            }else {
+                                id = id.concat(testArg2[i]);
+                            }
+                        
+                        
+                        }
+                        
                         System.out.println("Link will started here");
 
                     } else {
@@ -351,7 +440,59 @@ public class Tui {
                             }
 
                         }
+                        if (id.contains(",")) {
+                            String testID[] = id.split(",");
+                            int index = 0;
+                            for (int i = 0; i < testID.length; i++) {
+                                try {
+                                    List<Sensor> stopSenList = readSensorXML();
+                                    int j = 0;
+                                    for (Sensor stopSenList2 : stopSenList) {
+                                        if (testID[index].equals(stopSenList2.id)) {
+                                            j = 1;
+                                            System.out.println(stopSensor(stopSenList2.id));
+                                        }
+                                    }
+                                    if (j != 1) {
+                                        System.out.printf("The sensor ID : %s is not in the ConfigSenorXML\n", testID[index]);
+                                    }
+                                    index++;
+                                } catch (ParserConfigurationException ex) {
+                                    Logger.getLogger(Tui.class.getName()).log(Level.SEVERE, null, ex);
+                                } catch (SAXException ex) {
+                                    Logger.getLogger(Tui.class.getName()).log(Level.SEVERE, null, ex);
+                                } catch (IOException ex) {
+                                    Logger.getLogger(Tui.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+
+                            }
+
+                        } else {
+                            id.trim();
+                            try {
+                                List<Sensor> stopSenList = readSensorXML();
+                                int j = 0;
+                                for (Sensor stopSensor : stopSenList) {
+                                    if (id.equals(stopSensor.id)) {
+                                        j = 1;
+                                        System.out.println(stopSensor(id));
+                                    }
+                                }
+                                if (j != 1) {
+                                    System.out.printf("The sensor ID : %s is not in the ConfigSenorXML\n", id);
+                                }
+                            } catch (ParserConfigurationException ex) {
+                                Logger.getLogger(Tui.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (SAXException ex) {
+                                Logger.getLogger(Tui.class.getName()).log(Level.SEVERE, null, ex);
+                            } catch (IOException ex) {
+                                Logger.getLogger(Tui.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
                         System.out.println("Auto einai to args2 : " + args2);
+                    } else if (args2.equals("link")) {
+                        System.out.println("We will stop some links here");
+
                     } else {
                         System.out.println("For help of start press help start");
                     }
@@ -381,8 +522,8 @@ public class Tui {
         String isRunning;
         isRunning = obj.executeCommand(ourPID);
         if (isRunning.equals("")) {
-            return "The Sensor ID" + id + "is not running";
-        }else {
+            return "The Sensor ID " + id + " is not running";
+        } else {
             String kill = "kill " + isRunning;
             results = obj.executeCommand(kill);
             return "Stopping sensor " + id + " " + results;
@@ -416,6 +557,14 @@ public class Tui {
 
             return true;
         }
+    }
+    
+    private String getAOCS_PROGS() {
+        String command = "echo $AOCS_PROGS";
+        String aocs_progs = obj.executeCommand(command);
+        return aocs_progs;
+        
+    
     }
 
     //epistrefei array list typou Senosr

@@ -10,6 +10,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -53,6 +54,26 @@ public class udpClient {
     
     private static void echo (String msg) {
         System.out.println(msg);
+    }
+    
+    public void sendData (String host, int port, String msg) {
+        try {
+            sock = new DatagramSocket();
+            InetAddress ipAddrr = InetAddress.getByName(host);
+            byte[] buffer = msg.getBytes();
+            DatagramPacket sendDp = new DatagramPacket(buffer, buffer.length, ipAddrr, port);
+            sock.send(sendDp);
+            
+            
+        } catch (SocketException ex) {
+            Logger.getLogger(udpClient.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnknownHostException ex) {
+            Logger.getLogger(udpClient.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IOException ex) {
+            Logger.getLogger(udpClient.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    
+    
     }
     
 }
