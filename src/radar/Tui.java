@@ -399,16 +399,28 @@ public class Tui {
                         }
                         System.out.printf("Auto einai to args2 : %s\nKai auto einai to id : %s\n", args2, id);
                     } else if (args2.equals("link")) {
-                        for (int i = 1 ; i < testArg2.length ; i ++) {
+                        for (int i = 1; i < testArg2.length; i++) {
                             if (testArg2[i].equals("all")) {
-                            
-                            }else {
+                                System.out.println("Starting all links");
+                                try {
+                                    List<Link1> startLinkList = readLinkXML();
+                                    
+                                } catch (ParserConfigurationException ex) {
+                                    Logger.getLogger(Tui.class.getName()).log(Level.SEVERE, null, ex);
+                                } catch (SAXException ex) {
+                                    Logger.getLogger(Tui.class.getName()).log(Level.SEVERE, null, ex);
+                                } catch (IOException ex) {
+                                    Logger.getLogger(Tui.class.getName()).log(Level.SEVERE, null, ex);
+                                }
+                                
+
+                            } else {
                                 id = id.concat(testArg2[i]);
                             }
-                        
+
                         
                         }
-                        
+
                         System.out.println("Link will started here");
 
                     } else {
@@ -502,6 +514,7 @@ public class Tui {
                     state = "exit";
                     break;
                 default:
+                    help();
                     System.out.printf("The available commands are :\n %s\n%s\n%s\n", "status", "show", "exit");
             }
 
@@ -558,11 +571,36 @@ public class Tui {
             return true;
         }
     }
-    
+    private boolean getLinkInfo(String remoteID) {
+        String ourPID = "ps -u mio -f -o \"pid,args\" | grep \"-r " + remoteID + "\" | grep bin_sun4v_sunOS/link_transceive.exe | nawk \'{print $1}\'";
+        String isRunning;
+        isRunning = obj.executeCommand(ourPID);
+        //System.out.println(ourPID + " ::::::" + isRunning + "::::::");
+        if (isRunning.equals("")) {
+            return false;
+        } else {
+
+            return true;
+        }
+    }
+
     private String getAOCS_PROGS() {
         String command = "echo $AOCS_PROGS";
         String aocs_progs = obj.executeCommand(command);
         return aocs_progs;
+
+    }
+    
+    private void help() {
+        System.out.printf("%8s %25s\n", "Commands", "Example");
+        for (int i = 0 ; i < 40 ; i++) {
+            System.out.print("_");
+        }
+        System.out.printf("\n%-8s %25s\n%32s\n", "Start", "sensor", "link");
+        for (int i = 0 ; i < 40 ; i++) {
+            System.out.print("=");
+        }
+        System.out.printf("\n%-8s %25s\n%32s\n", "Stop", "sensor", "link");
         
     
     }
